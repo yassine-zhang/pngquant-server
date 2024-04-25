@@ -45918,7 +45918,7 @@ async function compressImage(fileUrl, quality) {
   const gzFile = await imagemin([fileUrl], {
     plugins: [
       import_imagemin_pngquant.default({
-        quality: [0.1, 0.3]
+        quality: [quality[0], quality[1]]
       })
     ]
   });
@@ -45926,8 +45926,10 @@ async function compressImage(fileUrl, quality) {
 }
 var checkCompressBody = function(req, res, next) {
   let quality = req.body.quality;
-  if (!(req.file instanceof Object))
-    return res.status(422).send("\u65E0\u6548\u53C2\u6570\uFF1Afile");
+  if (!req.file)
+    return res.status(422).send("\u6CA1\u6709\u4E0A\u4F20\u6587\u4EF6");
+  if (!(req.file instanceof Object) || !req.file.originalname || !req.file.size)
+    return res.status(422).send("\u4E0A\u4F20\u7684\u5B57\u6BB5\u4E0D\u662F\u4E00\u4E2A\u6587\u4EF6\uFF0C\u65E0\u6548\u53C2\u6570\uFF1Afile");
   if (quality) {
     req.body.quality = quality.substring(1, quality.length - 1).split(",").map((item) => parseFloat(item));
     quality = req.body.quality;

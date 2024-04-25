@@ -35,7 +35,7 @@ async function compressImage(fileUrl: string, quality: number[]): Promise<Buffer
   const gzFile = await imagemin([fileUrl], {
     plugins: [
       imageminPngquant({
-        quality: [0.1, 0.3],
+        quality: [quality[0], quality[1]],
       }),
     ],
   });
@@ -48,7 +48,11 @@ const app = express()
 const port = 9093
 
 // write your code here...
-app.use(cors())
+app.use(cors({
+  origin: '*',
+  credentials: true,
+  allowedHeaders: ["Content-Type", "Authorization"],
+}));
 app.use('/public', express.static('public'))
 app.use(express.json())
 
@@ -60,8 +64,10 @@ app.listen(port, () => {
 // 项目过于简单，不再使用schema类型检查插件
 function checkCompressBody(req: Request, res: Response, next: Function) {
   let quality = req.body.quality
+
   // 检测file
-  if (!(req.file instanceof Object)) return res.status(422).send('无效参数：file')
+  if (!req.file) return res.status(422).send('没有上传文件')
+  if (!(req.file instanceof Object) || !req.file.originalname || !req.file.size) return res.status(422).send('上传的字段不是一个文件，无效参数：file')
 
   // 检测quality
   if (quality) {
