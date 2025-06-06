@@ -115,8 +115,8 @@ function formatFileSize(bytes: number) {
 const nodeEnv = process.env.NODE_ENV;
 const baseUrl =
   nodeEnv === "development"
-    ? process.env.BASE_URL
-    : "https://imagemin.aidesign.org.cn";
+    ? "http://localhost:9093"
+    : "https://aigcimagemin.itcox.cn";
 console.log("NODE_ENV:", nodeEnv, " BASE_URL:", baseUrl);
 app.post("/compress", upload, checkCompressBody, async (req, res) => {
   const file = req.file;
